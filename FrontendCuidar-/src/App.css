@@ -1,0 +1,13 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-fallback {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: #607272;
+}
