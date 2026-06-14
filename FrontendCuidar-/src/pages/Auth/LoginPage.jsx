@@ -570,8 +570,7 @@ export default function LoginPage({ onLogin, onOpenCadastro }) {
                     {loadingProfile === profile && (
                       <span className="login-profile-button__spinner" aria-hidden="true" />
                     )}
-                    {loadingProfile === profile ? "Entrando como" : "Entrar como"}{" "}
-                    {profileNames[profile]}
+                    {loadingProfile === profile ? "Entrando..." : "Entrar"}
                   </span>
                   <span className="login-profile-button__description">{description}</span>
                 </button>

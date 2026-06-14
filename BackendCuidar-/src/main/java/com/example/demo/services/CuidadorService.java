@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,7 +70,7 @@ public class CuidadorService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cuidador", id.longValue()));
 
         String cpfLimpo = limparDocumento(dto.getCpf());
-        if (!cuidador.getCpf().equals(cpfLimpo)) {
+        if (!Objects.equals(cuidador.getCpf(), cpfLimpo)) {
             validarCpfDisponivel(cpfLimpo);
         }
 
@@ -163,6 +164,10 @@ public class CuidadorService {
     }
 
     private void validarCpfDisponivel(String cpf) {
+        if (cpf == null || cpf.isBlank()) {
+            throw new InvalidRequestException("CPF e obrigatorio");
+        }
+
         if (repository.existsByCpf(cpf) || idosoRepository.existsByCpf(cpf)) {
             throw new DuplicateResourceException("CPF ja esta em uso");
         }

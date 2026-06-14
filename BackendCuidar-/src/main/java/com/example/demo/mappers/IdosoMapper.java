@@ -77,7 +77,7 @@ public class IdosoMapper {
         idoso.setCpf(limparDocumento(dto.getCpf()));
         idoso.setObservacoes(TextoUtils.textoLivre(dto.getObservacoes()));
 
-    if (dto.getContatoId() != null) {
+        if (dto.getContatoId() != null) {
             Contato contato = new Contato();
             contato.setId(dto.getContatoId());
             idoso.setContato(contato);

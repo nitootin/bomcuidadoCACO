@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dtos.IdosoDTO;
-import com.example.demo.exceptions.UnauthorizedException;
 import com.example.demo.services.IdosoService;
 
 @RestController
@@ -33,7 +32,6 @@ public class IdosoController {
 
     @GetMapping("/listar_todos")
     public ResponseEntity<Page<IdosoDTO>> listarTodos(
-            Authentication authentication,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         return ResponseEntity.ok(service.listarAtivos(pageable));
     }

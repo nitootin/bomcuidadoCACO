@@ -13,7 +13,6 @@ import com.example.demo.entity.Alertas;
 import com.example.demo.entity.Contato;
 import com.example.demo.entity.Cuidador;
 import com.example.demo.entity.Idoso;
-import com.example.demo.entity.Instituicao;
 import com.example.demo.entity.Prescricao;
 import com.example.demo.entity.Remedio;
 import com.example.demo.enums.Perfil;
@@ -98,7 +97,6 @@ public final class TestDataFactory {
         dto.setNome("Maria");
         dto.setCpf("12345678901");
         dto.setObservacoes("Alergia a dipirona");
-        dto.setInstituicaoId(10);
         dto.setContato(contatoDTO());
         return dto;
     }
@@ -124,20 +122,11 @@ public final class TestDataFactory {
         idoso.setNome(nome);
         idoso.setCpf(cpf);
         idoso.setObservacoes("Alergia a dipirona");
-        idoso.setInstituicao(instituicao());
         idoso.setContato(contato(5, "11", "999999999"));
         idoso.setData_criacao(LocalDateTime.now());
         idoso.setPerfil(Perfil.IDOSO);
         idoso.setStatus(status);
         return idoso;
-    }
-
-    public static Instituicao instituicao() {
-        Instituicao instituicao = new Instituicao();
-        instituicao.setId(10);
-        instituicao.setNome("Instituicao Bom Cuidado");
-        instituicao.setStatus(Status.ATIVO);
-        return instituicao;
     }
 
     public static Contato contato(Integer id, String ddd, String telefone) {
@@ -181,16 +170,4 @@ public final class TestDataFactory {
         return cuidador;
     }
 
-    public static Instituicao instituicaoAuth() {
-        Instituicao instituicao = new Instituicao();
-        instituicao.setId(3);
-        instituicao.setNome("Instituicao");
-        instituicao.setCnpj("12345678000199");
-        instituicao.setEmail("instituicao@email.com");
-        instituicao.setSenha("hash");
-        instituicao.setPerfil(Perfil.INSTITUICAO);
-        instituicao.setStatus(Status.ATIVO);
-        instituicao.setData_criacao(LocalDateTime.now());
-        return instituicao;
-    }
 }

@@ -2,7 +2,6 @@ package com.example.demo.services;
 
 import static com.example.demo.support.TestDataFactory.contatoDTO;
 import static com.example.demo.support.TestDataFactory.cuidador;
-import static com.example.demo.support.TestDataFactory.instituicao;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +20,6 @@ import com.example.demo.enums.Status;
 import com.example.demo.exceptions.DuplicateResourceException;
 import com.example.demo.repository.CuidadorRepository;
 import com.example.demo.repository.IdosoRepository;
-import com.example.demo.repository.InstituicaoRepository;
 
 @ExtendWith(MockitoExtension.class)
 class CuidadorServiceTest {
@@ -31,9 +29,6 @@ class CuidadorServiceTest {
 
     @Mock
     private IdosoRepository idosoRepository;
-
-    @Mock
-    private InstituicaoRepository instituicaoRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -88,7 +83,6 @@ class CuidadorServiceTest {
         dto.setCpf("12345678901");
         dto.setEmail("cuidador@email.com");
         dto.setSenha("Senha@123");
-        dto.setInstituicaoId(instituicao().getId());
         dto.setContato(contatoDTO());
         return dto;
     }

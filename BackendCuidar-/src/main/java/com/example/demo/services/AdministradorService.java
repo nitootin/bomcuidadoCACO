@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,6 +11,7 @@ import com.example.demo.dtos.AdministradorDTO;
 import com.example.demo.entity.Administrador;
 import com.example.demo.enums.Status;
 import com.example.demo.exceptions.DuplicateResourceException;
+import com.example.demo.exceptions.InvalidRequestException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.mappers.AdministradorMapper;
 import com.example.demo.repository.AdministradorRepository;
@@ -43,6 +46,7 @@ public class AdministradorService {
 
     public AdministradorDTO criar(AdministradorDTO dto) {
         String cpfLimpo = limparDocumento(dto.getCpf());
+        validarCpf(cpfLimpo);
         if (repository.existsByCpf(cpfLimpo)) {
             throw new DuplicateResourceException("Já existe um administrador com esse CPF");
         }
@@ -60,7 +64,8 @@ public class AdministradorService {
                 .orElseThrow(() -> new ResourceNotFoundException("Administrador", id.longValue()));
 
         String cpfLimpo = limparDocumento(dto.getCpf());
-        if (!administrador.getCpf().equals(cpfLimpo)
+        validarCpf(cpfLimpo);
+        if (!Objects.equals(administrador.getCpf(), cpfLimpo)
                 && repository.existsByCpf(cpfLimpo)) {
             throw new DuplicateResourceException("CPF já está em uso");
         }
@@ -89,5 +94,11 @@ public class AdministradorService {
         }
 
         return valor.replaceAll("\\D", "");
+    }
+
+    private void validarCpf(String cpf) {
+        if (cpf == null || cpf.isBlank()) {
+            throw new InvalidRequestException("CPF e obrigatorio");
+        }
     }
 }

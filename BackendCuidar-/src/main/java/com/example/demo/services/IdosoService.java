@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -69,6 +70,7 @@ public class IdosoService {
 
     public IdosoDTO criar(IdosoDTO dto, Integer cuidadorId) {
         String cpfLimpo = limparDocumento(dto.getCpf());
+        validarCpf(cpfLimpo);
         if (cuidadorRepository.existsByCpf(cpfLimpo)) {
             throw new DuplicateResourceException("CPF ja esta em uso");
         }
@@ -104,7 +106,8 @@ public class IdosoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Idoso", id.longValue()));
 
         String cpfLimpo = limparDocumento(dto.getCpf());
-        if (!idoso.getCpf().equals(cpfLimpo)) {
+        validarCpf(cpfLimpo);
+        if (!Objects.equals(idoso.getCpf(), cpfLimpo)) {
             if (repository.existsByCpf(cpfLimpo) || cuidadorRepository.existsByCpf(cpfLimpo)) {
                 throw new DuplicateResourceException("CPF ja esta em uso");
             }
@@ -205,5 +208,11 @@ public class IdosoService {
         }
 
         return valor.replaceAll("\\D", "");
+    }
+
+    private void validarCpf(String cpf) {
+        if (cpf == null || cpf.isBlank()) {
+            throw new InvalidRequestException("CPF e obrigatorio");
+        }
     }
 }
