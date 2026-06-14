@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import BcButton from "../../../components/Bcbutton/BcButton";
-import BcFormModal from "../../../components/BcFormModal/BcFormModal";
+import BcFormModal, { BcFormModalRow, BcFormModalTextarea } from "../../../components/BcFormModal/BcFormModal";
 import BcInput from "../../../components/Bcinput/BcInput";
 import BcModal from "../../../components/BcModal/BcModal";
 import BcTopbar from "../../../components/BcTopbar/BcTopbar";
@@ -10,7 +10,7 @@ import {
   IconeSair,
   IconeSetaEsquerda,
 } from "../../../components/icons/Icons";
-import { listarIdososDoCuidador, obterSenhaAcessoIdoso } from "../../../api/instituicaoApi";
+import { cadastrarIdoso, listarIdososDoCuidador } from "../../../api/pessoasApi";
 import "./CuidadorIdososVinculados.css";
 
 function formatarCPF(valor = "") {
@@ -40,7 +40,15 @@ function normalizarBusca(valor = "") {
   return String(valor).toLowerCase().trim();
 }
 
-function IdosoCard({ idoso, onSenhaClick }) {
+const FORM_IDOSO_INICIAL = {
+  nome: "",
+  cpf: "",
+  ddd: "",
+  telefone: "",
+  observacoes: "",
+};
+
+function IdosoCard({ idoso }) {
   const inicial = String(idoso.nome || "?").charAt(0).toUpperCase();
 
   return (
@@ -58,13 +66,6 @@ function IdosoCard({ idoso, onSenhaClick }) {
             <dd>{formatarTelefone(idoso)}</dd>
           </div>
         </dl>
-        <button
-          className="cuidador-idosos-card__senha"
-          type="button"
-          onClick={() => onSenhaClick(idoso)}
-        >
-          {idoso.senhaAcessoGerada ? "Visualizar senha" : "Gerar senha"}
-        </button>
       </div>
     </article>
   );
@@ -75,40 +76,33 @@ export default function CuidadorIdososVinculados({ onBack, onLogout }) {
   const [busca, setBusca] = useState("");
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
-  const [idosoSenha, setIdosoSenha] = useState(null);
-  const [senhaCuidador, setSenhaCuidador] = useState("");
-  const [senhaAcesso, setSenhaAcesso] = useState("");
-  const [erroSenha, setErroSenha] = useState("");
-  const [carregandoSenha, setCarregandoSenha] = useState(false);
+  const [modalCadastro, setModalCadastro] = useState(false);
+  const [formIdoso, setFormIdoso] = useState(FORM_IDOSO_INICIAL);
+  const [erroCadastro, setErroCadastro] = useState("");
+  const [salvandoCadastro, setSalvandoCadastro] = useState(false);
 
-  useEffect(() => {
-    let ativo = true;
+  async function carregarIdosos(ativo = true) {
+    try {
+      setCarregando(true);
+      setErro("");
+      const lista = await listarIdososDoCuidador();
 
-    async function carregarIdosos() {
-      try {
-        setCarregando(true);
-        setErro("");
-        const lista = await listarIdososDoCuidador();
-
-        if (ativo) {
-          setIdosos(Array.isArray(lista) ? lista : []);
-        }
-      } catch {
-        if (ativo) {
-          setErro("Nao foi possivel carregar os usuarios vinculados.");
-        }
-      } finally {
-        if (ativo) {
-          setCarregando(false);
-        }
+      if (ativo) {
+        setIdosos(Array.isArray(lista) ? lista : []);
+      }
+    } catch {
+      if (ativo) {
+        setErro("Nao foi possivel carregar as pessoas acompanhadas.");
+      }
+    } finally {
+      if (ativo) {
+        setCarregando(false);
       }
     }
+  }
 
+  useEffect(() => {
     carregarIdosos();
-
-    return () => {
-      ativo = false;
-    };
   }, []);
 
   const idososFiltrados = useMemo(() => {
@@ -124,52 +118,58 @@ export default function CuidadorIdososVinculados({ onBack, onLogout }) {
     });
   }, [busca, idosos]);
 
-  function abrirModalSenha(idoso) {
-    setIdosoSenha(idoso);
-    setSenhaCuidador("");
-    setSenhaAcesso("");
-    setErroSenha("");
+  function abrirCadastro() {
+    setFormIdoso(FORM_IDOSO_INICIAL);
+    setErroCadastro("");
+    setModalCadastro(true);
   }
 
-  function fecharModalSenha() {
-    if (carregandoSenha) return;
-    setIdosoSenha(null);
-    setSenhaCuidador("");
-    setSenhaAcesso("");
-    setErroSenha("");
+  function fecharCadastro() {
+    if (salvandoCadastro) return;
+    setModalCadastro(false);
+    setErroCadastro("");
+    setFormIdoso(FORM_IDOSO_INICIAL);
   }
 
-  async function handleObterSenha(evento) {
+  function atualizarCampoIdoso(campo, valor) {
+    setFormIdoso((atual) => ({ ...atual, [campo]: valor }));
+    if (erroCadastro) setErroCadastro("");
+  }
+
+  function validarIdoso() {
+    if (!formIdoso.nome.trim()) return "Informe o nome da pessoa.";
+    if (formIdoso.cpf.replace(/\D/g, "").length !== 11) return "Informe um CPF valido.";
+    if (formIdoso.ddd.replace(/\D/g, "").length < 2) return "Informe o DDD.";
+    if (formIdoso.telefone.replace(/\D/g, "").length < 8) return "Informe um telefone valido.";
+    return "";
+  }
+
+  async function handleCadastrarIdoso(evento) {
     evento.preventDefault();
-
-    if (!senhaCuidador.trim()) {
-      setErroSenha("Informe sua senha para continuar.");
+    const erroValidacao = validarIdoso();
+    if (erroValidacao) {
+      setErroCadastro(erroValidacao);
       return;
     }
 
     try {
-      setCarregandoSenha(true);
-      setErroSenha("");
-      const resposta = await obterSenhaAcessoIdoso(idosoSenha.id, senhaCuidador);
-      setSenhaAcesso(resposta?.senha || "");
-      setIdosos((atuais) =>
-        atuais.map((idoso) =>
-          Number(idoso.id) === Number(idosoSenha.id)
-            ? { ...idoso, senhaAcessoGerada: true }
-            : idoso
-        )
-      );
+      setSalvandoCadastro(true);
+      setErroCadastro("");
+      await cadastrarIdoso(formIdoso);
+      setModalCadastro(false);
+      setFormIdoso(FORM_IDOSO_INICIAL);
+      await carregarIdosos(true);
     } catch (error) {
-      setErroSenha(error.message || "Nao foi possivel obter a senha.");
+      setErroCadastro(error.message || "Nao foi possivel cadastrar a pessoa.");
     } finally {
-      setCarregandoSenha(false);
+      setSalvandoCadastro(false);
     }
   }
 
   return (
     <div className="cuidador-idosos-page">
       <BcTopbar
-        title="Idosos Vinculados"
+        title="Pessoas acompanhadas"
         subtitle="Todos os idosos associados ao seu acompanhamento"
         actionLabel="Sair"
         actionIcon={<IconeSair />}
@@ -186,20 +186,25 @@ export default function CuidadorIdososVinculados({ onBack, onLogout }) {
           <div>
             <span><IconeIdosos /></span>
             <div>
-              <h1 id="usuarios-vinculados-titulo">Usuarios vinculados</h1>
-              <p>{idosos.length} usuario(s) vinculado(s) ao cuidador.</p>
+              <h1 id="usuarios-vinculados-titulo">Pessoas acompanhadas</h1>
+              <p>{idosos.length} pessoa(s) vinculada(s) ao cuidador.</p>
             </div>
           </div>
 
-          <label className="cuidador-idosos-busca">
-            <IconeBusca />
-            <input
-              type="search"
-              value={busca}
-              onChange={(event) => setBusca(event.target.value)}
-              placeholder="Buscar por nome ou CPF"
-            />
-          </label>
+          <div className="cuidador-idosos-header__acoes">
+            <label className="cuidador-idosos-busca">
+              <IconeBusca />
+              <input
+                type="search"
+                value={busca}
+                onChange={(event) => setBusca(event.target.value)}
+                placeholder="Buscar por nome ou CPF"
+              />
+            </label>
+            <BcButton type="button" fullWidth={false} onClick={abrirCadastro}>
+              Adicionar idoso
+            </BcButton>
+          </div>
         </section>
 
         {erro && (
@@ -218,63 +223,89 @@ export default function CuidadorIdososVinculados({ onBack, onLogout }) {
               <IdosoCard
                 key={idoso.id || idoso.cpf || idoso.nome}
                 idoso={idoso}
-                onSenhaClick={abrirModalSenha}
               />
             ))}
           </section>
         ) : (
           <div className="cuidador-idosos-empty">
             <span><IconeIdosos /></span>
-            <p>{busca ? "Nenhum usuario encontrado." : "Nenhum usuario vinculado ainda."}</p>
+            <p>{busca ? "Nenhuma pessoa encontrada." : "Nenhuma pessoa acompanhada ainda."}</p>
             <small>
               {busca
                 ? "Tente buscar por outro nome ou CPF."
-                : "Os usuarios vinculados pela instituicao aparecerao aqui."}
+                : "Use o botao Adicionar idoso para cadastrar a primeira pessoa."}
             </small>
           </div>
         )}
       </main>
 
-      <BcModal aberto={!!idosoSenha} onFechar={fecharModalSenha}>
+      <BcModal aberto={modalCadastro} onFechar={fecharCadastro}>
         <BcFormModal
-          title={senhaAcesso ? "Senha de acesso" : idosoSenha?.senhaAcessoGerada ? "Visualizar senha" : "Gerar senha"}
-          subtitle={idosoSenha ? `Confirme sua senha de cuidador para acessar a senha de ${idosoSenha.nome}.` : ""}
-          error={erroSenha}
-          onSubmit={handleObterSenha}
-          className="cuidador-idosos-senha-modal"
+          title="Adicionar idoso"
+          subtitle="Cadastre uma pessoa para acompanhar diretamente pela sua conta."
+          error={erroCadastro}
+          onSubmit={handleCadastrarIdoso}
+          className="cuidador-idosos-cadastro-modal"
         >
-          {!senhaAcesso ? (
-            <>
-              <BcInput
-                label="Senha do cuidador"
-                name="senhaCuidador"
-                type="password"
-                value={senhaCuidador}
-                onChange={(event) => setSenhaCuidador(event.target.value)}
-                autoComplete="current-password"
-              />
-              <div className="cuidador-idosos-senha-modal__acoes">
-                <BcButton type="button" variant="ghost" fullWidth={false} onClick={fecharModalSenha} disabled={carregandoSenha}>
-                  Cancelar
-                </BcButton>
-                <BcButton type="submit" fullWidth={false} loading={carregandoSenha}>
-                  Confirmar
-                </BcButton>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="cuidador-idosos-senha-modal__senha">
-                <span>Senha de acesso</span>
-                <strong>{senhaAcesso}</strong>
-              </div>
-              <BcButton type="button" variant="ghost" onClick={fecharModalSenha}>
-                Fechar
-              </BcButton>
-            </>
-          )}
+          <BcInput
+            label="Nome"
+            name="nome"
+            type="text"
+            placeholder="Nome completo"
+            value={formIdoso.nome}
+            onChange={(event) => atualizarCampoIdoso("nome", event.target.value)}
+          />
+          <BcInput
+            label="CPF"
+            name="cpf"
+            type="text"
+            placeholder="000.000.000-00"
+            value={formatarCPF(formIdoso.cpf)}
+            onChange={(event) => atualizarCampoIdoso("cpf", event.target.value.replace(/\D/g, "").slice(0, 11))}
+            inputMode="numeric"
+            maxLength={14}
+          />
+          <BcFormModalRow>
+            <BcInput
+              label="DDD"
+              name="ddd"
+              type="text"
+              placeholder="11"
+              value={formIdoso.ddd}
+              onChange={(event) => atualizarCampoIdoso("ddd", event.target.value.replace(/\D/g, "").slice(0, 2))}
+              inputMode="numeric"
+              maxLength={2}
+            />
+            <BcInput
+              label="Telefone"
+              name="telefone"
+              type="text"
+              placeholder="999999999"
+              value={formIdoso.telefone}
+              onChange={(event) => atualizarCampoIdoso("telefone", event.target.value.replace(/\D/g, "").slice(0, 9))}
+              inputMode="numeric"
+              maxLength={9}
+            />
+          </BcFormModalRow>
+          <BcFormModalTextarea
+            id="observacoes"
+            label="Observacoes"
+            name="observacoes"
+            placeholder="Alergias, cuidados importantes ou informacoes uteis"
+            value={formIdoso.observacoes}
+            onChange={(event) => atualizarCampoIdoso("observacoes", event.target.value)}
+          />
+          <div className="cuidador-idosos-cadastro-modal__acoes">
+            <BcButton type="button" variant="ghost" fullWidth={false} onClick={fecharCadastro} disabled={salvandoCadastro}>
+              Cancelar
+            </BcButton>
+            <BcButton type="submit" fullWidth={false} loading={salvandoCadastro}>
+              Cadastrar
+            </BcButton>
+          </div>
         </BcFormModal>
       </BcModal>
     </div>
   );
 }
+

@@ -37,7 +37,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/auth/login",
-                                "/auth/idoso/login",
                                 "/auth/verificar-2fa",
                                 "/auth/reenviar-codigo",
                                 "/swagger-ui/**",
@@ -46,15 +45,13 @@ public class SecurityConfig {
                                 "/auth/nova-senha",
                                 "/v3/api-docs/**")
                         .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/cuidador/cadastrar").permitAll()
                         .requestMatchers("/administrador/**").hasRole("ADMINISTRADOR")
                         .requestMatchers("/admin/**").hasRole("ADMINISTRADOR") //
-                        .requestMatchers("/instituicao/**").hasAnyRole("ADMINISTRADOR", "INSTITUICAO")
-                        .requestMatchers("/cuidador/**").hasAnyRole("CUIDADOR", "INSTITUICAO")
-                        .requestMatchers("/idoso/**").hasAnyRole("CUIDADOR", "INSTITUICAO")
+                        .requestMatchers("/cuidador/**").hasRole("CUIDADOR")
+                        .requestMatchers("/idoso/**").hasRole("CUIDADOR")
                         .requestMatchers("/remedio/**").hasRole("CUIDADOR")
                         .requestMatchers("/prescricao/**").hasRole("CUIDADOR")
-                        .requestMatchers(HttpMethod.GET, "/alertas/me", "/alerta/me").hasRole("IDOSO")
-                        .requestMatchers(HttpMethod.PUT, "/alertas/*/confirmar").hasRole("IDOSO")
                         .requestMatchers("/alerta/**").hasRole("CUIDADOR")
                         .requestMatchers("/alertas/**").hasRole("CUIDADOR")
                         .requestMatchers("/contato/**").authenticated()

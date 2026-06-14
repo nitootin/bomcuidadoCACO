@@ -1,17 +1,17 @@
-/**
+﻿/**
  * ModalGerenciarCuidadores
  *
  * Props:
  *   aberto      : boolean
  *   onFechar    : fn
  *   idoso       : { id, nome }
- *   cuidadores  : Array  — lista de cuidadores da instituição
+ *   cuidadores  : Array  â€” lista de cuidadores da instituiÃ§Ã£o
  */
 import { useCallback, useEffect, useState } from "react";
 import BcButton from "../Bcbutton/BcButton";
 import BcModal from "../BcModal/BcModal";
 import BcToast, { useBcToast } from "../BcToast/BcToast";
-import { listarVinculosPorIdoso, criarVinculo, deletarVinculo } from "../../api/instituicaoApi";
+import { listarVinculosPorIdoso, criarVinculo, deletarVinculo } from "../../api/pessoasApi";
 import "./Modalgerenciarcuidadores.css";
 
 function inicial(nome = "") {
@@ -36,11 +36,11 @@ export default function ModalGerenciarCuidadores({ aberto, onFechar, idoso, cuid
   const [vinculos, setVinculos]         = useState([]);
   const [carregando, setCarregando]     = useState(false);
   const [salvando, setSalvando]         = useState(false);
-  // set de cuidadorId com vínculo ativo (do servidor)
+  // set de cuidadorId com vÃ­nculo ativo (do servidor)
   const [vinculados, setVinculados]     = useState(new Set());
-  // mapa cuidadorId → vinculoId (para deletar)
+  // mapa cuidadorId â†’ vinculoId (para deletar)
   const [mapaVinculos, setMapaVinculos] = useState({});
-  // seleções locais (estado local antes de confirmar)
+  // seleÃ§Ãµes locais (estado local antes de confirmar)
   const [selecoesLocais, setSelecoesLocais] = useState(new Set());
 
   const carregarVinculos = useCallback(async () => {
@@ -54,10 +54,10 @@ export default function ModalGerenciarCuidadores({ aberto, onFechar, idoso, cuid
       lista.forEach((v) => { mapa[Number(v.cuidadorId)] = v.id; });
       setVinculados(ids);
       setMapaVinculos(mapa);
-      // Inicializa seleções locais com os vínculos atuais
+      // Inicializa seleÃ§Ãµes locais com os vÃ­nculos atuais
       setSelecoesLocais(new Set(ids));
     } catch (err) {
-      mostrarToast("erro", "Erro ao carregar vínculos", err.message);
+      mostrarToast("erro", "Erro ao carregar vÃ­nculos", err.message);
     } finally {
       setCarregando(false);
     }
@@ -83,22 +83,22 @@ export default function ModalGerenciarCuidadores({ aberto, onFechar, idoso, cuid
   async function handleConcluir() {
     setSalvando(true);
     try {
-      // Calcula diferenças
+      // Calcula diferenÃ§as
       const adicionados = Array.from(selecoesLocais).filter((id) => !vinculados.has(id));
       const removidos = Array.from(vinculados).filter((id) => !selecoesLocais.has(id));
 
-      // Se não há mudanças, apenas fecha
+      // Se nÃ£o hÃ¡ mudanÃ§as, apenas fecha
       if (adicionados.length === 0 && removidos.length === 0) {
         onFechar();
         return;
       }
 
-      // Cria novos vínculos
+      // Cria novos vÃ­nculos
       for (const cuidadorId of adicionados) {
         await criarVinculo({ cuidadorId, idosoId: idoso.id });
       }
 
-      // Remove vínculos
+      // Remove vÃ­nculos
       for (const cuidadorId of removidos) {
         const vinculoId = mapaVinculos[cuidadorId];
         if (vinculoId) {
@@ -106,10 +106,10 @@ export default function ModalGerenciarCuidadores({ aberto, onFechar, idoso, cuid
         }
       }
 
-      // Recarrega os vínculos
+      // Recarrega os vÃ­nculos
       await carregarVinculos();
 
-      // Mostra um único toast com o resumo
+      // Mostra um Ãºnico toast com o resumo
       let mensagem = "";
       if (adicionados.length > 0 && removidos.length > 0) {
         mensagem = `${adicionados.length} cuidador(es) vinculado(s) e ${removidos.length} desvinculado(s) com sucesso.`;
@@ -120,12 +120,12 @@ export default function ModalGerenciarCuidadores({ aberto, onFechar, idoso, cuid
       }
 
       if (mensagem) {
-        mostrarToast("sucesso", "Vínculos atualizados", mensagem);
+        mostrarToast("sucesso", "VÃ­nculos atualizados", mensagem);
       }
 
       onFechar();
     } catch (err) {
-      mostrarToast("erro", "Erro ao atualizar vínculos", err.message);
+      mostrarToast("erro", "Erro ao atualizar vÃ­nculos", err.message);
     } finally {
       setSalvando(false);
     }
@@ -138,7 +138,7 @@ export default function ModalGerenciarCuidadores({ aberto, onFechar, idoso, cuid
       <BcToast {...toastProps} />
       <BcModal aberto={aberto} onFechar={onFechar}>
         <div className="mgc-wrap">
-          {/* Cabeçalho */}
+          {/* CabeÃ§alho */}
           <div className="mgc-header">
             <div className="mgc-header__avatar">
               {inicial(idoso?.nome)}
@@ -149,10 +149,10 @@ export default function ModalGerenciarCuidadores({ aberto, onFechar, idoso, cuid
             </div>
           </div>
 
-          {/* Instruções */}
+          {/* InstruÃ§Ãµes */}
           <div className="mgc-instrucoes">
-            <strong>Instruções:</strong> Selecione os cuidadores que terão acesso às
-            informações deste idoso. Os cuidadores marcados poderão visualizar dados
+            <strong>InstruÃ§Ãµes:</strong> Selecione os cuidadores que terÃ£o acesso Ã s
+            informaÃ§Ãµes deste idoso. Os cuidadores marcados poderÃ£o visualizar dados
             e gerenciar medicamentos.
           </div>
 
@@ -166,7 +166,7 @@ export default function ModalGerenciarCuidadores({ aberto, onFechar, idoso, cuid
             {carregando ? (
               <p className="mgc-vazio">Carregando...</p>
             ) : cuidadores.length === 0 ? (
-              <p className="mgc-vazio">Nenhum cuidador cadastrado na instituição.</p>
+              <p className="mgc-vazio">Nenhum cuidador cadastrado na instituiÃ§Ã£o.</p>
             ) : (
               cuidadores.map((c) => {
                 const ativo = selecoesLocais.has(Number(c.id));

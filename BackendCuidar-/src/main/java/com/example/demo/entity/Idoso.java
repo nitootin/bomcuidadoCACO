@@ -24,7 +24,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true, exclude = { "instituicao", "contato", "vinculos" })
+@ToString(callSuper = true, exclude = { "contato", "vinculos" })
 @Table(name = "idoso")
 public class Idoso extends Usuario {
 
@@ -34,14 +34,6 @@ public class Idoso extends Usuario {
 
     @Column(length = 300)
     private String observacoes;
-
-    @Column(name = "senha_acesso_criptografada", length = 500)
-    private String senhaAcessoCriptografada;
-
-    @NotNull(message = "Instituição é obrigatória")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "instituicao_id", nullable = false, foreignKey = @ForeignKey(name = "fk_idoso_instituicao"))
-    private Instituicao instituicao;
 
     @NotNull(message = "Contato é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

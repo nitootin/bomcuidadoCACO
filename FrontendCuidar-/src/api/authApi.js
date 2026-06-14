@@ -2,8 +2,6 @@ import { API_BASE_URL } from "./env";
 import { somenteNumeros } from "../utils/validacaoDocumento";
 
 const PERFIL_BACKEND = {
-  administrador: "ADMINISTRADOR",
-  instituicao: "INSTITUICAO",
   cuidador: "CUIDADOR",
 };
 
@@ -99,6 +97,31 @@ export async function verificar2fa({ identificador, codigo, perfil, rememberMe =
   }
 
   salvarSessao(data, rememberMe, identificadorNormalizado);
+  return data;
+}
+
+export async function cadastrarCuidador(dados) {
+  const response = await fetchComTimeout(`${API_BASE_URL}/cuidador/cadastrar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nome: dados.nome?.trim(),
+      cpf: somenteNumeros(dados.cpf),
+      email: dados.email?.trim(),
+      senha: dados.senha,
+      contato: {
+        ddd: somenteNumeros(dados.ddd),
+        telefone: somenteNumeros(dados.telefone),
+      },
+    }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.message || "Erro ao criar cadastro.");
+  }
+
   return data;
 }
 

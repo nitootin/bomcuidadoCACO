@@ -29,26 +29,12 @@ const IconeChave = () => (
 );
 
 /* ── Helpers ── */
-function formatarCNPJ(v = "") {
-  const n = String(v).replace(/\D/g, "").slice(0, 14);
-  return n
-    .replace(/(\d{2})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1/$2")
-    .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
-}
-
 function formatarCPF(v = "") {
   const n = String(v).replace(/\D/g, "").slice(0, 11);
   return n
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-}
-
-function formatarCEP(v = "") {
-  const n = String(v).replace(/\D/g, "").slice(0, 8);
-  return n.replace(/(\d{5})(\d{0,3})/, "$1-$2").replace(/-$/, "");
 }
 
 function formatarTelefone(ddd = "", tel = "") {
@@ -58,7 +44,7 @@ function formatarTelefone(ddd = "", tel = "") {
 }
 
 function labelPerfil(perfil) {
-  const map = { INSTITUICAO: "Instituição", CUIDADOR: "Cuidador", ADMINISTRADOR: "Administrador" };
+  const map = { CUIDADOR: "Cuidador" };
   return map[perfil] || perfil;
 }
 
@@ -288,23 +274,11 @@ export default function BcPerfilModal({ aberto, onFechar }) {
             <div className="bcp-campos">
               <CampoInfo label="Nome"  valor={dados.nome} />
               <CampoInfo label="Email" valor={dados.email} />
-              {perfil === "INSTITUICAO" && (
-                <>
-                  <CampoInfo label="CNPJ"   valor={formatarCNPJ(dados.cnpj)} />
-                  <CampoInfo label="Rua"    valor={dados.rua} />
-                  <CampoInfo label="Bairro" valor={dados.bairro} />
-                  <CampoInfo label="UF"     valor={dados.uf} />
-                  <CampoInfo label="CEP"    valor={formatarCEP(dados.cep)} />
-                </>
-              )}
               {perfil === "CUIDADOR" && (
                 <>
                   <CampoInfo label="CPF"      valor={formatarCPF(dados.cpf)} />
                   <CampoInfo label="Telefone" valor={dados.contato ? formatarTelefone(dados.contato.ddd, dados.contato.telefone) : ""} />
                 </>
-              )}
-              {perfil === "ADMINISTRADOR" && (
-                <CampoInfo label="CPF" valor={formatarCPF(dados.cpf)} />
               )}
               <CampoInfo label="Status" valor={dados.status} />
             </div>

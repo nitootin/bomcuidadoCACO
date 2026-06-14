@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import com.example.demo.dtos.IdosoDTO;
 import com.example.demo.entity.Contato;
 import com.example.demo.entity.Idoso;
-import com.example.demo.entity.Instituicao;
 import com.example.demo.enums.Perfil;
 import com.example.demo.enums.Status;
 import com.example.demo.utils.TextoUtils;
@@ -22,13 +21,6 @@ public class IdosoMapper {
         dto.setNome(TextoUtils.paraExibicao(idoso.getNome()));
         dto.setCpf(idoso.getCpf());
         dto.setObservacoes(TextoUtils.textoLivre(idoso.getObservacoes()));
-        dto.setSenhaAcessoGerada(idoso.getSenhaAcessoCriptografada() != null
-                && !idoso.getSenhaAcessoCriptografada().isBlank());
-
-        if (idoso.getInstituicao() != null) {
-            dto.setInstituicaoId(idoso.getInstituicao().getId());
-        }
-
         if (idoso.getContato() != null) {
             dto.setContatoId(idoso.getContato().getId());
             dto.setContato(ContatoMapper.toDTO(idoso.getContato()));
@@ -50,12 +42,6 @@ public class IdosoMapper {
         idoso.setNome(TextoUtils.paraBanco(dto.getNome()));
         idoso.setCpf(limparDocumento(dto.getCpf()));
         idoso.setObservacoes(TextoUtils.textoLivre(dto.getObservacoes()));
-
-        if (dto.getInstituicaoId() != null) {
-            Instituicao instituicao = new Instituicao();
-            instituicao.setId(dto.getInstituicaoId());
-            idoso.setInstituicao(instituicao);
-        }
 
         if (dto.getContatoId() != null) {
             Contato contato = new Contato();
@@ -84,20 +70,12 @@ public class IdosoMapper {
         return idoso;
     }
 
-    public static void atualizarIdoso(Idoso idoso, IdosoDTO dto, Instituicao instituicao) {
+    public static void atualizarIdoso(Idoso idoso, IdosoDTO dto) {
         if (dto == null || idoso == null) return;
 
         idoso.setNome(TextoUtils.paraBanco(dto.getNome()));
         idoso.setCpf(limparDocumento(dto.getCpf()));
         idoso.setObservacoes(TextoUtils.textoLivre(dto.getObservacoes()));
-
-        if (instituicao != null) {
-            idoso.setInstituicao(instituicao);
-        } else if (dto.getInstituicaoId() != null) {
-            Instituicao stub = new Instituicao();
-            stub.setId(dto.getInstituicaoId());
-            idoso.setInstituicao(stub);
-        }
 
     if (dto.getContatoId() != null) {
             Contato contato = new Contato();

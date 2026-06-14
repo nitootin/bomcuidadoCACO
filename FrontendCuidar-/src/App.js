@@ -2,33 +2,29 @@ import { useEffect, useState } from "react";
 import { getAuthToken, logout } from "./api/authApi";
 import BcConfirmacao from "./components/BcConfirmacao/BcConfirmacao";
 import { IconeSair } from "./components/icons/Icons";
-import AdminDashboard from "./pages/Administrador/DashBoard/Admindashboard";
+import CadastroPage from "./pages/Auth/CadastroPage";
 import LoginPage from "./pages/Auth/LoginPage";
 import CuidadorConsultas from "./pages/Cuidador/Consultas/CuidadorConsultas";
 import CuidadorDashboard from "./pages/Cuidador/Dashboard/CuidadorDashboard";
 import CuidadorIdososVinculados from "./pages/Cuidador/IdososVinculados/CuidadorIdososVinculados";
 import CuidadorRemediosPrescricao from "./pages/Cuidador/RemediosPrescricao/CuidadorRemediosPrescricao";
-import InstituicaoProfileHome from "./pages/Instituicao/ProfileHome/InstituicaoProfileHome";
 import "./styles/global.css";
 import "./App.css";
 
 const ROUTES = {
   login: "#/login",
-  administrador: "#/administrador",
+  cadastro: "#/cadastro",
   cuidador: "#/cuidador",
   cuidadorIdososVinculados: "#/cuidador/usuarios-vinculados",
   cuidadorConsultas: "#/cuidador/consultas",
   cuidadorRemediosPrescricao: "#/cuidador/remedios-prescricao",
-  instituicao: "#/instituicao",
 };
 
 const ROUTE_PROFILE = {
-  "dashboard-admin": "ADMINISTRADOR",
   "area-cuidador": "CUIDADOR",
   "cuidador-idosos-vinculados": "CUIDADOR",
   "cuidador-consultas": "CUIDADOR",
   "cuidador-remedios-prescricao": "CUIDADOR",
-  "area-instituicao": "INSTITUICAO",
 };
 
 function getStoredProfile() {
@@ -37,12 +33,8 @@ function getStoredProfile() {
 
 function getRouteByProfile(profile) {
   switch (profile) {
-    case "ADMINISTRADOR":
-      return ROUTES.administrador;
     case "CUIDADOR":
       return ROUTES.cuidador;
-    case "INSTITUICAO":
-      return ROUTES.instituicao;
     default:
       return ROUTES.login;
   }
@@ -50,8 +42,6 @@ function getRouteByProfile(profile) {
 
 function getRouteFromHash(hash) {
   switch (hash) {
-    case ROUTES.administrador:
-      return "dashboard-admin";
     case ROUTES.cuidador:
       return "area-cuidador";
     case ROUTES.cuidadorIdososVinculados:
@@ -60,8 +50,8 @@ function getRouteFromHash(hash) {
       return "cuidador-consultas";
     case ROUTES.cuidadorRemediosPrescricao:
       return "cuidador-remedios-prescricao";
-    case ROUTES.instituicao:
-      return "area-instituicao";
+    case ROUTES.cadastro:
+      return "cadastro";
     case ROUTES.login:
     case "":
     case "#":
@@ -104,19 +94,11 @@ export default function App() {
   }
 
   function handleLogin(role) {
-    if (role === "administrador") {
-      navigateTo(ROUTES.administrador);
-      return;
-    }
-
     if (role === "cuidador") {
       navigateTo(ROUTES.cuidador);
       return;
     }
 
-    if (role === "instituicao") {
-      navigateTo(ROUTES.instituicao);
-    }
   }
 
   function hasAccess(route) {
@@ -130,7 +112,7 @@ export default function App() {
   }
 
   function renderTela() {
-    if (tela === "login" && getAuthToken()) {
+    if ((tela === "login" || tela === "cadastro") && getAuthToken()) {
       navigateTo(getRouteByProfile(getStoredProfile()));
       return null;
     }
@@ -143,10 +125,10 @@ export default function App() {
 
     switch (tela) {
       case "login":
-        return <LoginPage onLogin={handleLogin} />;
+        return <LoginPage onLogin={handleLogin} onOpenCadastro={() => navigateTo(ROUTES.cadastro)} />;
 
-      case "dashboard-admin":
-        return <AdminDashboard onLogout={solicitarLogout} />;
+      case "cadastro":
+        return <CadastroPage onBackToLogin={() => navigateTo(ROUTES.login)} />;
 
       case "area-cuidador":
         return (
@@ -181,9 +163,6 @@ export default function App() {
             onBack={() => navigateTo(ROUTES.cuidador)}
           />
         );
-
-      case "area-instituicao":
-        return <InstituicaoProfileHome onLogout={solicitarLogout} />;
 
       default:
         return (

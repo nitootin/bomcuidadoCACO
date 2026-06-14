@@ -17,17 +17,12 @@ async function requestGet(path) {
 }
 
 export function buscarPerfilUsuario() {
-  const id     = localStorage.getItem("usuarioId")    || sessionStorage.getItem("usuarioId");
-  const perfil = localStorage.getItem("perfil")       || sessionStorage.getItem("perfil");
+  const id = localStorage.getItem("usuarioId") || sessionStorage.getItem("usuarioId");
+  const perfil = localStorage.getItem("perfil") || sessionStorage.getItem("perfil");
 
-  switch (perfil) {
-    case "INSTITUICAO":
-      return requestGet(`/instituicao/listar/${id}`);
-    case "CUIDADOR":
-      return requestGet(`/cuidador/listar/${id}`);
-    case "ADMINISTRADOR":
-      return requestGet(`/administrador/listar/${id}`);
-    default:
-      return Promise.reject(new Error("Perfil não identificado."));
+  if (perfil === "CUIDADOR") {
+    return requestGet(`/cuidador/listar/${id}`);
   }
+
+  return Promise.reject(new Error("Perfil nao identificado."));
 }

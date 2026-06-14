@@ -22,10 +22,8 @@ public class IdosoDTO {
     private String nome;
     private String cpf;
     private String observacoes;
-    private Integer instituicaoId;
     private Integer contatoId;
     private com.example.demo.dtos.ContatoDTO contato;
-    private Boolean senhaAcessoGerada;
     private LocalDateTime data_criacao;
     private LocalDateTime data_atualizacao;
     private Perfil perfil;

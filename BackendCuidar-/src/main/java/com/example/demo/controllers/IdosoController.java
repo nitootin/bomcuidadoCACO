@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dtos.IdosoDTO;
 import com.example.demo.exceptions.UnauthorizedException;
 import com.example.demo.services.IdosoService;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/idoso")
@@ -36,11 +35,6 @@ public class IdosoController {
     public ResponseEntity<Page<IdosoDTO>> listarTodos(
             Authentication authentication,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
-        if (isInstituicao(authentication)) {
-            Integer instituicaoId = (Integer) authentication.getPrincipal();
-            return ResponseEntity.ok(service.listarAtivosPorInstituicao(instituicaoId, pageable));
-        }
-
         return ResponseEntity.ok(service.listarAtivos(pageable));
     }
 
@@ -55,8 +49,9 @@ public class IdosoController {
     }
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<IdosoDTO> criar(@RequestBody IdosoDTO dto) {
-        IdosoDTO criada = service.criar(dto);
+    public ResponseEntity<IdosoDTO> criar(@RequestBody IdosoDTO dto, Authentication authentication) {
+        Integer cuidadorId = isCuidador(authentication) ? (Integer) authentication.getPrincipal() : null;
+        IdosoDTO criada = service.criar(dto, cuidadorId);
         return ResponseEntity.status(HttpStatus.CREATED).body(criada);
     }
 
@@ -69,24 +64,6 @@ public class IdosoController {
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         service.inativar(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/{id}/senha-acesso")
-    public ResponseEntity<Map<String, Object>> obterSenhaAcesso(
-            @PathVariable Integer id,
-            @RequestBody Map<String, String> dados,
-            Authentication authentication) {
-        if (!isCuidador(authentication)) {
-            throw new UnauthorizedException("Apenas cuidadores podem acessar a senha do idoso");
-        }
-
-        Integer cuidadorId = (Integer) authentication.getPrincipal();
-        return ResponseEntity.ok(service.obterSenhaAcesso(id, cuidadorId, dados.get("senha")));
-    }
-
-    private boolean isInstituicao(Authentication authentication) {
-        return authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(authority -> "ROLE_INSTITUICAO".equals(authority.getAuthority()));
     }
 
     private boolean isCuidador(Authentication authentication) {

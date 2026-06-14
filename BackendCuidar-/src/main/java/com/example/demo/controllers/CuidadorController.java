@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,13 +33,7 @@ public class CuidadorController {
     @GetMapping("/listar_todos")
     public ResponseEntity<Page<CuidadorDTO>> listarTodos(
             @RequestParam(required = false) String cpf,
-            Authentication authentication,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
-        if (isInstituicao(authentication)) {
-            Integer instituicaoId = (Integer) authentication.getPrincipal();
-            return ResponseEntity.ok(service.listarAtivosPorInstituicao(instituicaoId, cpf, pageable));
-        }
-
         return ResponseEntity.ok(service.listarAtivos(pageable));
     }
 
@@ -74,10 +67,5 @@ public class CuidadorController {
     @GetMapping("/ping")
     public String ping() {
         return "pong";
-    }
-
-    private boolean isInstituicao(Authentication authentication) {
-        return authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(authority -> "ROLE_INSTITUICAO".equals(authority.getAuthority()));
     }
 }

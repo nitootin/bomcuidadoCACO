@@ -13,7 +13,7 @@ import {
   IconeTelefone,
 } from "../../../components/icons/Icons";
 import { atualizarAlerta, listarAlertas } from "../../../api/alertaApi";
-import { listarIdososDoCuidador } from "../../../api/instituicaoApi";
+import { listarIdososDoCuidador } from "../../../api/pessoasApi";
 import "./CuidadorDashboard.css";
 
 const CONTATOS_EMERGENCIA = [
@@ -351,7 +351,7 @@ export default function CuidadorDashboard({ onLogout, onOpenConsultas, onOpenRem
             <div className="cuidador-empty">
               <span><IconeIdosos /></span>
               <p>Nenhum idoso cadastrado ainda.</p>
-              <small>Os idosos cadastrados pela instituicao aparecerao aqui.</small>
+              <small>Os idosos adicionados por voce aparecerao aqui.</small>
             </div>
           )}
         </section>
@@ -408,3 +408,4 @@ export default function CuidadorDashboard({ onLogout, onOpenConsultas, onOpenRem
     </div>
   );
 }
+

@@ -19,7 +19,7 @@ import {
   IconeVisualizar,
   IconeVoltar,
 } from "../../../components/icons/Icons";
-import { listarIdososDoCuidador } from "../../../api/instituicaoApi";
+import { listarIdososDoCuidador } from "../../../api/pessoasApi";
 import { cadastrarAlerta, cancelarAlerta, listarAlertasPorIdoso } from "../../../api/alertaApi";
 import { atualizarPrescricao as atualizarPrescricaoApi, cadastrarPrescricao, inativarPrescricao, listarPrescricoesPorIdoso } from "../../../api/prescricaoApi";
 import { atualizarRemedio as atualizarRemedioApi, cadastrarRemedio, inativarRemedio, listarRemedios } from "../../../api/remedioApi";
@@ -893,7 +893,7 @@ export default function CuidadorRemediosPrescricao({ onBack, onLogout }) {
           />
 
           <BcButton type="submit" loading={salvandoRemedio}>
-            {remedioEmEdicao ? "Salvar alterações" : "Cadastrar"}
+            {remedioEmEdicao ? "Salvar alteraÃ§Ãµes" : "Cadastrar"}
           </BcButton>
         </BcFormModal>
       </BcModal>
@@ -1078,7 +1078,7 @@ export default function CuidadorRemediosPrescricao({ onBack, onLogout }) {
           />
 
           <BcButton type="submit" loading={salvandoPrescricao} disabled={inativandoPrescricao}>
-            {prescricaoEmEdicao ? "Salvar alterações" : "Criar prescrição"}
+            {prescricaoEmEdicao ? "Salvar alteraÃ§Ãµes" : "Criar prescriÃ§Ã£o"}
           </BcButton>
         </BcFormModal>
       </BcModal>
@@ -1097,3 +1097,4 @@ export default function CuidadorRemediosPrescricao({ onBack, onLogout }) {
     </div>
   );
 }
+

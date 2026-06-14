@@ -32,8 +32,6 @@ export function definirNovaSenha(email, novaSenha) {
 
 export function reenviarCodigo2FA({ identificador, perfil }) {
   const PERFIL_BACKEND = {
-    administrador: "ADMINISTRADOR",
-    instituicao:   "INSTITUICAO",
     cuidador:      "CUIDADOR",
   };
 

@@ -21,6 +21,5 @@ public class CuidadorDTO {
     private String email;
     private String senha;
     private Status status;
-    private Integer instituicaoId;
     private ContatoDTO contato;
 }

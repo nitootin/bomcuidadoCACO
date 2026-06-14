@@ -1,6 +1,5 @@
 package com.example.demo.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -19,11 +18,5 @@ public interface IdosoRepository extends JpaRepository<Idoso, Integer> {
     boolean existsByCpf(String cpf);
 
     Page<Idoso> findByStatus(Status status, Pageable pageable);
-
-    Page<Idoso> findByStatusAndInstituicaoId(Status status, Integer instituicaoId, Pageable pageable);
-
-    List<Idoso> findByInstituicaoId(Integer instituicaoId);
-
-    List<Idoso> findBySenhaAcessoCriptografadaIsNotNull();
 
 }

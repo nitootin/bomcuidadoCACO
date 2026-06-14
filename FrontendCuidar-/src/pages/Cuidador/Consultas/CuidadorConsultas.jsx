@@ -7,7 +7,7 @@ import BcModal from "../../../components/BcModal/BcModal";
 import BcToast, { useBcToast } from "../../../components/BcToast/BcToast";
 import BcTopbar from "../../../components/BcTopbar/BcTopbar";
 import { IconeSair, IconeVoltar } from "../../../components/icons/Icons";
-import { listarIdososDoCuidador } from "../../../api/instituicaoApi";
+import { listarIdososDoCuidador } from "../../../api/pessoasApi";
 import { atualizarAlerta, cadastrarAlerta, cancelarAlerta } from "../../../api/alertaApi";
 import "./CuidadorConsultas.css";
 
@@ -611,7 +611,7 @@ export default function CuidadorConsultas({ onBack, onLogout }) {
           />
 
           <BcButton type="submit" loading={salvandoConsulta}>
-            {consultaEmEdicao ? "Salvar alterações" : "Cadastrar consulta"}
+            {consultaEmEdicao ? "Salvar alteraÃ§Ãµes" : "Cadastrar consulta"}
           </BcButton>
         </BcFormModal>
       </BcModal>
@@ -673,3 +673,4 @@ export default function CuidadorConsultas({ onBack, onLogout }) {
     </div>
   );
 }
+

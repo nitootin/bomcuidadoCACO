@@ -5,10 +5,6 @@ function somenteNumeros(valor = "") {
   return String(valor).replace(/\D/g, "");
 }
 
-function getInstituicaoId() {
-  return Number(localStorage.getItem("usuarioId") || sessionStorage.getItem("usuarioId"));
-}
-
 function getUsuarioId() {
   return Number(localStorage.getItem("usuarioId") || sessionStorage.getItem("usuarioId"));
 }
@@ -34,39 +30,8 @@ async function requestApi(path, { method = "GET", dados, fallback } = {}) {
   return response.json().catch(() => null);
 }
 
-export async function obterSenhaAcessoIdoso(idosoId, senhaCuidador) {
-  const response = await fetch(`${API_BASE_URL}/idoso/${idosoId}/senha-acesso`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ senha: senhaCuidador }),
-  });
-
-  if (!response.ok) {
-    const erro = await response.json().catch(() => ({}));
-    throw new Error(erro.message || "Erro ao obter senha de acesso do idoso.");
-  }
-
-  return response.json().catch(() => null);
-}
-
 function conteudoPaginado(data) {
   return Array.isArray(data?.content) ? data.content : Array.isArray(data) ? data : [];
-}
-
-function normalizarCuidador(dados) {
-  const cuidador = {
-    nome: dados.nome?.trim(),
-    cpf: somenteNumeros(dados.cpf),
-    email: dados.email?.trim(),
-    instituicaoId: dados.instituicaoId || getInstituicaoId(),
-    contato: dados.contato || {
-      id: dados.contatoId || dados.contato?.id,
-      ddd: somenteNumeros(dados.ddd),
-      telefone: somenteNumeros(dados.telefone),
-    },
-  };
-  if (dados.senha?.trim()) cuidador.senha = dados.senha;
-  return cuidador;
 }
 
 function normalizarIdoso(dados) {
@@ -74,7 +39,6 @@ function normalizarIdoso(dados) {
     nome: dados.nome,
     cpf: somenteNumeros(dados.cpf),
     observacoes: dados.observacoes,
-    instituicaoId: dados.instituicaoId || getInstituicaoId(),
     contatoId: dados.contatoId,
   };
 }
@@ -89,49 +53,6 @@ function normalizarContato(dados) {
   if (dados.idosos) contato.idosos = dados.idosos;
   return contato;
 }
-
-/* ── Cuidadores ── */
-
-export async function listarCuidadores(page = 0, size = 100) {
-  const data = await requestApi(`/cuidador/listar_todos?page=${page}&size=${size}`, {
-    fallback: "Erro ao buscar cuidadores.",
-  });
-  const instituicaoId = getInstituicaoId();
-  return conteudoPaginado(data).filter((c) => Number(c.instituicaoId) === instituicaoId);
-}
-
-export async function cadastrarCuidador(dados) {
-  return requestApi("/cuidador/cadastrar", {
-    method: "POST",
-    dados: normalizarCuidador(dados),
-    fallback: "Erro ao cadastrar cuidador.",
-  });
-}
-
-export async function atualizarCuidador(id, dados) {
-  return requestApi(`/cuidador/atualizar/${id}`, {
-    method: "PUT",
-    dados: normalizarCuidador(dados),
-    fallback: "Erro ao atualizar cuidador.",
-  });
-}
-
-export async function reativarCuidador(id, dados) {
-  return requestApi(`/cuidador/reativar/${id}`, {
-    method: "PUT",
-    dados: normalizarCuidador(dados),
-    fallback: "Erro ao reativar cuidador.",
-  });
-}
-
-export async function deletarCuidador(id) {
-  return requestApi(`/cuidador/deletar/${id}`, {
-    method: "DELETE",
-    fallback: "Erro ao deletar cuidador.",
-  });
-}
-
-/* ── Idosos ── */
 
 export async function listarIdosos(page = 0, size = 100) {
   const data = await requestApi(`/idoso/listar_todos?page=${page}&size=${size}`, {
@@ -167,8 +88,6 @@ export async function buscarIdosoPorCpf(cpf) {
   if (!response.ok) throw new Error(await getErrorMessage(response, "Erro ao buscar idoso pelo CPF."));
   return response.json().catch(() => null);
 }
-
-/* ── Contatos ── */
 
 export async function cadastrarContato(dados) {
   return requestApi("/contato/cadastrar", {
@@ -206,7 +125,7 @@ async function salvarIdoso(dados) {
   });
 }
 
-async function cadastrarIdosoComContato(dados) {
+export async function cadastrarIdoso(dados) {
   const contato = await cadastrarContato(dados);
   try {
     return await salvarIdoso({ ...dados, contatoId: contato?.id });
@@ -225,10 +144,6 @@ export async function atualizarIdoso(id, dados) {
   });
 }
 
-export async function cadastrarIdoso(dados) {
-  return cadastrarIdosoComContato(dados);
-}
-
 export async function deletarIdoso(id) {
   return requestApi(`/idoso/deletar/${id}`, {
     method: "DELETE",
@@ -236,25 +151,9 @@ export async function deletarIdoso(id) {
   });
 }
 
-/* ── Vínculos ── */
-
-export async function listarVinculos(page = 0, size = 100) {
-  const data = await requestApi(`/vinculo/listar_todos?page=${page}&size=${size}`, {
-    fallback: "Erro ao buscar vínculos.",
-  });
-  return conteudoPaginado(data);
-}
-
 export async function listarVinculosPorIdoso(idosoId, page = 0, size = 100) {
   const data = await requestApi(`/vinculo/idoso/${idosoId}?page=${page}&size=${size}`, {
-    fallback: "Erro ao buscar vínculos do idoso.",
-  });
-  return conteudoPaginado(data);
-}
-
-export async function listarVinculosPorCuidador(cuidadorId, page = 0, size = 100) {
-  const data = await requestApi(`/vinculo/cuidador/${cuidadorId}?page=${page}&size=${size}`, {
-    fallback: "Erro ao buscar vínculos do cuidador.",
+    fallback: "Erro ao buscar vinculos do idoso.",
   });
   return conteudoPaginado(data);
 }
@@ -263,20 +162,20 @@ export async function criarVinculo({ cuidadorId, idosoId }) {
   return requestApi("/vinculo/cadastrar", {
     method: "POST",
     dados: { cuidadorId, idosoId },
-    fallback: "Erro ao criar vínculo.",
+    fallback: "Erro ao criar vinculo.",
   });
 }
 
 export async function deletarVinculo(id) {
   return requestApi(`/vinculo/deletar/${id}`, {
     method: "DELETE",
-    fallback: "Erro ao deletar vínculo.",
+    fallback: "Erro ao deletar vinculo.",
   });
 }
 
 export async function definirVinculoEmergencia(vinculoId) {
   return requestApi(`/vinculo/${vinculoId}/emergencia`, {
     method: "PUT",
-    fallback: "Erro ao definir vínculo de emergência.",
+    fallback: "Erro ao definir vinculo de emergencia.",
   });
 }

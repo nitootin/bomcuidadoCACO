@@ -28,14 +28,9 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(dados));
     }
 
-    @PostMapping("/idoso/login")
-    public ResponseEntity<?> loginIdoso(@RequestBody Map<String, String> dados) {
-        return ResponseEntity.ok(authService.loginIdoso(dados));
-    }
-
     @PostMapping("/verificar-2fa")
     public ResponseEntity<?> verificar2fa(@RequestBody Map<String, String> dados) {
-        String identificador = primeiroValor(dados, "identificador", "cpfCnpj", "cpf", "cnpj");
+        String identificador = primeiroValor(dados, "identificador", "cpfCnpj", "cpf");
         String codigo = dados.get("codigo");
         String perfil = dados.get("perfil");
 
@@ -87,7 +82,7 @@ public class AuthController {
     
     @PostMapping("/reenviar-codigo")
     public ResponseEntity<?> reenviarCodigo(@RequestBody Map<String, String> dados) {
-        String identificador = primeiroValor(dados, "identificador", "cpfCnpj", "cpf", "cnpj");
+        String identificador = primeiroValor(dados, "identificador", "cpfCnpj", "cpf");
         String perfil = dados.get("perfil");
 
         if (identificador == null || perfil == null) {

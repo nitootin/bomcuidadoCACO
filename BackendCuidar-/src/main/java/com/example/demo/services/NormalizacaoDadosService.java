@@ -10,14 +10,12 @@ import com.example.demo.entity.Administrador;
 import com.example.demo.entity.Contato;
 import com.example.demo.entity.Cuidador;
 import com.example.demo.entity.Idoso;
-import com.example.demo.entity.Instituicao;
 import com.example.demo.entity.Prescricao;
 import com.example.demo.entity.Remedio;
 import com.example.demo.repository.AdministradorRepository;
 import com.example.demo.repository.ContatoRepository;
 import com.example.demo.repository.CuidadorRepository;
 import com.example.demo.repository.IdosoRepository;
-import com.example.demo.repository.InstituicaoRepository;
 import com.example.demo.repository.PrescricaoRepository;
 import com.example.demo.repository.RemedioRepository;
 import com.example.demo.utils.TextoUtils;
@@ -30,7 +28,6 @@ public class NormalizacaoDadosService {
     private final ContatoRepository contatoRepository;
     private final CuidadorRepository cuidadorRepository;
     private final IdosoRepository idosoRepository;
-    private final InstituicaoRepository instituicaoRepository;
     private final PrescricaoRepository prescricaoRepository;
     private final RemedioRepository remedioRepository;
 
@@ -39,14 +36,12 @@ public class NormalizacaoDadosService {
             ContatoRepository contatoRepository,
             CuidadorRepository cuidadorRepository,
             IdosoRepository idosoRepository,
-            InstituicaoRepository instituicaoRepository,
             PrescricaoRepository prescricaoRepository,
             RemedioRepository remedioRepository) {
         this.administradorRepository = administradorRepository;
         this.contatoRepository = contatoRepository;
         this.cuidadorRepository = cuidadorRepository;
         this.idosoRepository = idosoRepository;
-        this.instituicaoRepository = instituicaoRepository;
         this.prescricaoRepository = prescricaoRepository;
         this.remedioRepository = remedioRepository;
     }
@@ -58,7 +53,6 @@ public class NormalizacaoDadosService {
         normalizarContatos();
         normalizarCuidadores();
         normalizarIdosos();
-        normalizarInstituicoes();
         normalizarPrescricoes();
         normalizarRemedios();
     }
@@ -88,16 +82,6 @@ public class NormalizacaoDadosService {
         for (Idoso idoso : idosoRepository.findAll()) {
             idoso.setNome(TextoUtils.paraBanco(idoso.getNome()));
             idoso.setCpf(TextoUtils.limparDocumento(idoso.getCpf()));
-        }
-    }
-
-    private void normalizarInstituicoes() {
-        for (Instituicao instituicao : instituicaoRepository.findAll()) {
-            instituicao.setNome(TextoUtils.paraBanco(instituicao.getNome()));
-            instituicao.setCnpj(TextoUtils.limparDocumento(instituicao.getCnpj()));
-            instituicao.setBairro(TextoUtils.paraBanco(instituicao.getBairro()));
-            instituicao.setUf(TextoUtils.paraBanco(instituicao.getUf()));
-            instituicao.setCep(TextoUtils.limparDocumento(instituicao.getCep()));
         }
     }
 

@@ -192,6 +192,12 @@
   flex-wrap: wrap;
 }
 
+.login-form__split {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.35fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
 .login-form__checkbox {
   display: inline-flex;
   align-items: center;
@@ -491,8 +497,13 @@
   }
 
   .login-form__row,
+  .login-form__split,
   .login-card__footer {
     align-items: flex-start;
     justify-content: flex-start;
+  }
+
+  .login-form__split {
+    grid-template-columns: 1fr;
   }
 }

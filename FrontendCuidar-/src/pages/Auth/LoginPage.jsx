@@ -21,7 +21,7 @@ import {
   definirNovaSenha,
   reenviarCodigo2FA,
 } from "../../api/recuperarSenhaApi";
-import { formatarCpfCnpj } from "../../utils/validacaoDocumento";
+import { formatarCPF } from "../../utils/validacaoDocumento";
 import "./LoginPage.css";
 
 /* ── Validação de senha ── */
@@ -36,15 +36,11 @@ function validarSenha(senha) {
 
 /* ── Dados de perfil ── */
 const profileDescriptions = {
-  cuidador:      "Acesse sua rotina, oportunidades e informações de atendimento.",
-  instituicao:   "Gerencie equipes, cadastros e demandas institucionais.",
-  administrador: "Controle cadastros, indicadores e configurações da plataforma.",
+  cuidador:      "Acesse sua rotina, pessoas acompanhadas e informações de cuidado.",
 };
 
 const profileNames = {
   cuidador:      "Cuidador",
-  instituicao:   "Instituição",
-  administrador: "Administrador",
 };
 
 const TIMER_SEGUNDOS = 30;
@@ -221,7 +217,7 @@ function ModalRecuperarSenha({ aberto, onFechar }) {
   async function handleEnviarIdentificador(e) {
     e.preventDefault();
     setErro("");
-    if (!identificador.trim()) { setErro("Informe seu CPF ou CNPJ cadastrado."); return; }
+    if (!identificador.trim()) { setErro("Informe seu CPF cadastrado."); return; }
     setLoading(true);
     try {
       const data = await enviarIdentificador(identificador);
@@ -297,12 +293,12 @@ function ModalRecuperarSenha({ aberto, onFechar }) {
             <div className="mrs-header">
               <div className="mrs-header__icone"><IconeEmail /></div>
               <h2>Recuperar senha</h2>
-              <p>Informe o CPF ou CNPJ cadastrado para receber o código de recuperação.</p>
+              <p>Informe o CPF cadastrado para receber o código de recuperação.</p>
             </div>
             <form className="mrs-form" onSubmit={handleEnviarIdentificador} noValidate>
               <BcInput
-                label="CPF ou CNPJ" name="mrs-identificador" type="text"
-                placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                label="CPF" name="mrs-identificador" type="text"
+                placeholder="000.000.000-00"
                 value={identificador}
                 onChange={e => { setIdentificador(e.target.value); setErro(""); }}
                 autoComplete="off" error={erro}
@@ -399,7 +395,7 @@ function ModalRecuperarSenha({ aberto, onFechar }) {
 /* ══════════════════════════════════
    Login Page
    ══════════════════════════════════ */
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({ onLogin, onOpenCadastro }) {
   const { toastProps, mostrarToast, fecharToast } = useBcToast();
   const [cpfCnpj, setCpfCnpj]               = useState("");
   const [password, setPassword]             = useState("");
@@ -417,13 +413,13 @@ export default function LoginPage({ onLogin }) {
   const [twoFaRemember, setTwoFaRemember]           = useState(true);
 
   function handleCpfCnpjChange(event) {
-    const valorFormatado = formatarCpfCnpj(event.target.value);
+    const valorFormatado = formatarCPF(event.target.value);
     setCpfCnpj(valorFormatado);
     if (error) setError("");
   }
 
   function validateForm() {
-    if (!cpfCnpj.trim()) { setError("Informe seu CPF ou CNPJ."); return false; }
+    if (!cpfCnpj.trim()) { setError("Informe seu CPF."); return false; }
     if (!password.trim()) { setError("Informe a sua senha."); return false; }
     setError("");
     return true;
@@ -488,12 +484,12 @@ export default function LoginPage({ onLogin }) {
 
       <section className="login-page__hero">
         <div className="login-page__hero-content">
-          <div className="login-page__eyebrow">Plataforma de cuidado e gestão</div>
+          <div className="login-page__eyebrow">Plataforma de cuidado pessoal</div>
           <BcLogo size="lg" />
-          <h1>Acesso seguro para quem cuida, organiza e acompanha.</h1>
+          <h1>Acesso seguro para quem cuida e acompanha.</h1>
           <p>
-            Entre com sua conta para acessar rotinas assistenciais, gestão
-            institucional e painéis administrativos em um só ambiente.
+            Entre com sua conta para acessar rotinas assistenciais, pessoas
+            acompanhadas e painéis administrativos em um só ambiente.
           </p>
           <div className="login-page__highlights" aria-label="Diferenciais da plataforma">
             <article className="login-highlight">
@@ -506,15 +502,15 @@ export default function LoginPage({ onLogin }) {
             <article className="login-highlight">
               <span className="login-highlight__icon" aria-hidden="true">[]</span>
               <div>
-                <strong>Gestão institucional</strong>
-                <p>Organização de cadastros, equipes e processos de forma clara.</p>
+                <strong>Rotina organizada</strong>
+                <p>Cadastros, alertas e prescrições reunidos em um fluxo simples.</p>
               </div>
             </article>
             <article className="login-highlight">
               <span className="login-highlight__icon" aria-hidden="true">OK</span>
               <div>
-                <strong>Acesso por perfil</strong>
-                <p>Fluxo preparado para cuidador, instituição e administrador.</p>
+                <strong>Acesso do cuidador</strong>
+                <p>Fluxo preparado para quem cuida e acompanha pessoas idosas.</p>
               </div>
             </article>
           </div>
@@ -526,15 +522,15 @@ export default function LoginPage({ onLogin }) {
           <div className="login-card__header">
             <span className="login-card__tag">Login</span>
             <h2>Bem-vindo de volta</h2>
-            <p>Use seu CPF ou CNPJ e senha para acessar a plataforma.</p>
+            <p>Use seu CPF e senha para acessar a plataforma.</p>
           </div>
 
           <form className="login-form" onSubmit={e => e.preventDefault()} noValidate>
             <BcInput
-              label="CPF ou CNPJ" name="cpfCnpj" type="text"
-              placeholder="000.000.000-00 ou 00.000.000/0000-00"
+              label="CPF" name="cpfCnpj" type="text"
+              placeholder="000.000.000-00"
               value={cpfCnpj} onChange={handleCpfCnpjChange}
-              autoComplete="off" inputMode="numeric" maxLength={18}
+              autoComplete="off" inputMode="numeric" maxLength={14}
               error={error && !cpfCnpj.trim() ? error : ""}
             />
             <BcInput
@@ -582,6 +578,12 @@ export default function LoginPage({ onLogin }) {
               ))}
             </div>
           </form>
+          <div className="login-card__footer">
+            <span>Ainda não tem conta?</span>
+            <button type="button" className="login-form__link" onClick={onOpenCadastro}>
+              Cadastre-se como cuidador
+            </button>
+          </div>
         </div>
       </section>
     </main>

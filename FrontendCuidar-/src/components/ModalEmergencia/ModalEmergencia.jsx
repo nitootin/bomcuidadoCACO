@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ModalEmergencia
  *
  * Props:
@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import BcButton from "../Bcbutton/BcButton";
 import BcModal from "../BcModal/BcModal";
 import BcToast, { useBcToast } from "../BcToast/BcToast";
-import { listarVinculosPorIdoso, definirVinculoEmergencia } from "../../api/instituicaoApi";
+import { listarVinculosPorIdoso, definirVinculoEmergencia } from "../../api/pessoasApi";
 import "./ModalEmergencia.css";
 
 function inicial(nome = "") {
@@ -29,9 +29,9 @@ export default function ModalEmergencia({ aberto, onFechar, idoso }) {
   const [vinculos, setVinculos]           = useState([]);
   const [carregando, setCarregando]       = useState(false);
   const [salvando, setSalvando]           = useState(false);
-  // id do vínculo selecionado localmente (ainda não confirmado)
+  // id do vÃ­nculo selecionado localmente (ainda nÃ£o confirmado)
   const [selecionado, setSelecionado]     = useState(null);
-  // id do vínculo atual de emergência (vindo do backend)
+  // id do vÃ­nculo atual de emergÃªncia (vindo do backend)
   const [emergenciaAtual, setEmergenciaAtual] = useState(null);
 
   const carregarVinculos = useCallback(async () => {
@@ -44,7 +44,7 @@ export default function ModalEmergencia({ aberto, onFechar, idoso }) {
       setEmergenciaAtual(atual?.id ?? null);
       setSelecionado(atual?.id ?? null);
     } catch (err) {
-      mostrarToast("erro", "Erro ao carregar vínculos", err.message);
+      mostrarToast("erro", "Erro ao carregar vÃ­nculos", err.message);
     } finally {
       setCarregando(false);
     }
@@ -60,11 +60,11 @@ export default function ModalEmergencia({ aberto, onFechar, idoso }) {
     try {
       await definirVinculoEmergencia(selecionado);
       const nome = vinculos.find(v => v.id === selecionado)?.nomeCuidador || "";
-      mostrarToast("sucesso", "Contato de emergência atualizado",
-        `${nome} agora é o contato de emergência de ${idoso.nome}.`);
+      mostrarToast("sucesso", "Contato de emergÃªncia atualizado",
+        `${nome} agora Ã© o contato de emergÃªncia de ${idoso.nome}.`);
       onFechar();
     } catch (err) {
-      mostrarToast("erro", "Erro ao definir emergência", err.message);
+      mostrarToast("erro", "Erro ao definir emergÃªncia", err.message);
     } finally {
       setSalvando(false);
     }
@@ -78,22 +78,22 @@ export default function ModalEmergencia({ aberto, onFechar, idoso }) {
       <BcModal aberto={aberto} onFechar={onFechar}>
         <div className="mem-wrap">
 
-          {/* Cabeçalho */}
+          {/* CabeÃ§alho */}
           <div className="mem-header">
             <div className="mem-header__icone"><IconeEmergencia /></div>
             <div>
-              <h2 className="mem-header__titulo">Contato de Emergência</h2>
+              <h2 className="mem-header__titulo">Contato de EmergÃªncia</h2>
               <p className="mem-header__sub">{idoso?.nome}</p>
             </div>
           </div>
 
-          {/* Instrução */}
+          {/* InstruÃ§Ã£o */}
           <div className="mem-instrucao">
-            <strong>Selecione</strong> o cuidador que será acionado em caso de emergência
+            <strong>Selecione</strong> o cuidador que serÃ¡ acionado em caso de emergÃªncia
             e clique em <strong>Confirmar</strong> para salvar.
           </div>
 
-          {/* Lista de vínculos */}
+          {/* Lista de vÃ­nculos */}
           <div className="mem-lista">
             {carregando ? (
               <p className="mem-vazio">Carregando cuidadores...</p>

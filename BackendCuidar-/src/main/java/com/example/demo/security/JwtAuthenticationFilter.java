@@ -88,7 +88,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         return "OPTIONS".equalsIgnoreCase(request.getMethod())
                 || path.equals("/auth/login")
-                || path.equals("/auth/idoso/login")
                 || path.equals("/auth/verificar-2fa")
                 || path.equals("/auth/reenviar-codigo")
                 || path.equals("/auth/recuperar-senha")

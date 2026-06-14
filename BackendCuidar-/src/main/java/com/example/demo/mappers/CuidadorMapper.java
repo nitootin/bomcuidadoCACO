@@ -8,7 +8,6 @@ import com.example.demo.dtos.ContatoDTO;
 import com.example.demo.dtos.CuidadorDTO;
 import com.example.demo.entity.Contato;
 import com.example.demo.entity.Cuidador;
-import com.example.demo.entity.Instituicao;
 import com.example.demo.enums.Perfil;
 import com.example.demo.enums.Status;
 import com.example.demo.utils.TextoUtils;
@@ -29,10 +28,6 @@ public class CuidadorMapper {
         dto.setCpf(cuidador.getCpf());
         dto.setEmail(cuidador.getEmail());
         dto.setStatus(cuidador.getStatus());
-
-        if (cuidador.getInstituicao() != null) {
-            dto.setInstituicaoId(cuidador.getInstituicao().getId());
-        }
 
         if (cuidador.getContato() != null) {
             ContatoDTO contatoDTO = new ContatoDTO();
@@ -58,12 +53,6 @@ public class CuidadorMapper {
         cuidador.setCpf(limparDocumento(dto.getCpf()));
         cuidador.setEmail(dto.getEmail());
         cuidador.setSenha(dto.getSenha());
-
-        if (dto.getInstituicaoId() != null) {
-            Instituicao instituicao = new Instituicao();
-            instituicao.setId(dto.getInstituicaoId());
-            cuidador.setInstituicao(instituicao);
-        }
 
         if (dto.getContato() != null) {
             Contato contato = new Contato();
